@@ -1,0 +1,131 @@
+# Path to the test file (Liquid template)
+#
+# Variables:
+#
+# - `manifest_dir`: Package directory
+# - `contest`:      Contest ID (e.g. "abc100")
+# - `bin_name`:     Name of a `bin` target (e.g. "abc100-a")
+# - `bin_alias`:    "Alias" for a `bin` target defined in `pacakge.metadata.cargo-compete` (e.g. "a")
+# - `problem`:      Alias for `bin_alias` (deprecated)
+#
+# Additional filters:
+#
+# - `kebabcase`: Convert to kebab case (by using the `heck` crate)
+test-suite = "{{ manifest_dir }}/testcases/{{ bin_alias }}.yml"
+
+# Open files with the command (`jq` command that outputs `string[] | string[][]`)
+#
+# VSCode:
+#open = '[["code", "-a", .manifest_dir], ["code"] + (.paths | map([.src, .test_suite]) | flatten)]'
+# Emacs:
+#open = '["emacsclient", "-n"] + (.paths | map([.src, .test_suite]) | flatten)'
+
+[template]
+src = '''
+use proconio::input;
+use proconio::marker::{Chars, Usize1};
+use std::cmp::Ordering;
+use std::collections::{VecDeque, HashSet, BTreeSet, BTreeMap};
+use std::ops::{Add, Sub, Mul};
+use std::fmt::Display;
+use num::pow::Pow;
+use std::iter::{FromIterator, IntoIterator};
+
+// BinarySearch
+trait BSearch<I> {fn first_upper_than(&self, p: I) -> Option<&I>;fn last_lower_than(&self, p: I) -> Option<&I>;}
+impl BSearch<isize> for BTreeSet<isize> {fn first_upper_than(&self, p: isize) -> Option<&isize> {self.range(p+1..).next()} fn last_lower_than(&self, p: isize) -> Option<&isize> {self.range(std::isize::MIN..p).rev().next()}}
+impl BSearch<usize> for BTreeSet<usize> {fn first_upper_than(&self, p: usize) -> Option<&usize> {self.range(p+1..).next()} fn last_lower_than(&self, p: usize) -> Option<&usize> {self.range(0..p).rev().next()}}
+fn bsearch<F>(lower: isize, upper: isize, sat: F) -> Option<isize>where F: Fn(isize) -> bool{let mut ng = lower-1;let mut ok = upper+1;while (ng-ok).abs() > 1 {let mid = (ng+ok)/2;if sat(mid) {ok = mid;} else {ng = mid;}}return if ok == upper+1 { None } else { Some(ok) };}
+// cumulative sum
+fn cumlative<N: std::ops::Add + num::Zero + Clone + Copy>(v: Vec<N>) -> Vec<N> {let mut a: Vec<N> = vec![N::zero(); v.len()+1];for i in 0..v.len() {a[i+1] = a[i] + v[i]}a}
+// Mint
+const MINT_MOD: isize = 998244353;
+#[derive(Clone, Copy)]
+struct Mint(isize);impl Add for Mint {type Output = Mint;fn add(self, rhs: Self) -> Self::Output {Mint(((self.0 % MINT_MOD) + (rhs.0 % MINT_MOD)) % MINT_MOD)}}impl Sub for Mint {type Output = Mint;fn sub(self, rhs: Self) -> Self::Output {Mint(((self.0 % MINT_MOD) - (rhs.0 % MINT_MOD)).rem_euclid(MINT_MOD))}}impl Mul for Mint {type Output = Mint;fn mul(self, rhs: Self) -> Self::Output {Mint(((self.0 % MINT_MOD) * (rhs.0 % MINT_MOD)) % MINT_MOD)}}impl Display for Mint {fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {f.write_fmt(format_args!("{}", self.0))}}impl Pow<usize> for Mint {type Output = Mint;fn pow(self, rhs: usize) -> Self::Output {match rhs {0 => Mint(1),1 => self,n => {let m = self.pow(n/2);if n&1==0 { m*m } else { self * m*m }}}}}
+// UnionFind
+struct UnionFind{roots: Vec<usize>, ranks: Vec<usize>}
+impl UnionFind {fn new(size: usize) -> Self {UnionFind { roots: (0..size).collect(), ranks: vec![0; size] }}fn root(&mut self, x: usize) -> usize {if self.roots[x] == x {return x;}let r = self.root(self.roots[x]);self.roots[x] = r;return r;}fn same(&mut self, x: usize, y: usize) -> bool {self.root(x) == self.root(y)}fn union(&mut self, x: usize, y: usize) {let rx = self.root(x);let ry = self.root(y);if rx != ry {if self.ranks[rx] < self.ranks[ry] {self.roots[rx] = ry;} else {self.roots[ry] = rx;if self.ranks[x] == self.ranks[y] {self.ranks[x] += 1;}}}}}
+// fmt
+fn yesno(b: bool) {println!("{}", if b { "Yes" } else { "No" });}
+
+
+
+fn main() {
+    input! {
+    }
+}
+'''
+
+[template.new]
+# `edition` for `Cargo.toml`.
+edition = "2018"
+# `profile` for `Cargo.toml`.
+#
+# By setting this, you can run tests with `opt-level=3` while enabling `debug-assertions` and `overflow-checks`.
+#profile = '''
+#[dev]
+#opt-level = 3
+#'''
+dependencies = '''
+proconio = "0.4.3"
+num = "0.4.0"
+rand = "0.6"
+rustc-hash = "1.1"
+'''
+dev-dependencies = '''
+#atcoder-202004-lock = { git = "https://github.com/qryxip/atcoder-202004-lock" }
+'''
+
+[template.new.copy-files]
+
+[new]
+kind = "cargo-compete"
+# Platform
+#
+# - atcoder
+# - codeforces
+# - yukicoder
+platform = "atcoder"
+# Path (Liquid template)
+#
+# Variables:
+#
+# - `contest`:      Contest ID. **May be nil**
+# - `package_name`: Package name
+path = "./{{ contest }}"
+
+#[new]
+#kind = "oj-api"
+#url = "https://atcoder.jp/contests/{{ id }}"
+#path = "./{{ contest }}"
+
+# for Library-Checker
+#[add]
+#url = "https://judge.yosupo.jp/problem/{{ args[0] }}"
+##is-contest = ["false"] # optional
+##target-kind = "bin" # ["bin", "example"]. default to "bin"
+#bin-name = '{{ args[0] }}'
+##bin-alias = '{{ args[0] }}' # optional
+##bin-src-path = './src/bin/{{ bin_alias }}.rs' # optional
+
+# for yukicoder
+#[add]
+#url = '{% case args[0] %}{% when "contest" %}https://yukicoder.me/contests/{{ args[1] }}{% when "problem" %}https://yukicoder.me/problems/no/{{ args[1] }}{% endcase %}'
+#is-contest = ["bash", "-c", '[[ $(cut -d / -f 4) == "contests" ]]'] # optional
+##target-kind = "bin" # ["bin", "example"]. default to "bin"
+#bin-name = '{% assign segments = url | split: "/" %}{{ segments[5] }}'
+##bin-alias = '{% assign segments = url | split: "/" %}{{ segments[5] }}' # optional
+##bin-src-path = './src/bin/{{ bin_alias }}.rs' # optional
+
+[test]
+# Toolchain for the test. (optional)
+toolchain = "1.42.0"
+# Profile for `cargo build`. ("dev" | "release")
+#
+# Defaults to `"dev"`.
+#profile = "dev"
+
+#[submit.transpile]
+#kind = "command"
+#args = ["cargo", "equip", "--exclude-atcoder-crates", "--resolve-cfgs", "--remove", "docs", "--minify", "libs", "--rustfmt", "--check", "--bin", "{{ bin_name }}"]
+##language_id = ""
