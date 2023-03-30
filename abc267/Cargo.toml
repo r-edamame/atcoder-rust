@@ -1,0 +1,54 @@
+[package]
+name = "abc267"
+version = "0.1.0"
+edition = "2018"
+
+[package.metadata.cargo-compete.bin]
+abc267-a = { alias = "a", problem = "https://atcoder.jp/contests/abc267/tasks/abc267_a" }
+abc267-b = { alias = "b", problem = "https://atcoder.jp/contests/abc267/tasks/abc267_b" }
+abc267-c = { alias = "c", problem = "https://atcoder.jp/contests/abc267/tasks/abc267_c" }
+abc267-d = { alias = "d", problem = "https://atcoder.jp/contests/abc267/tasks/abc267_d" }
+abc267-e = { alias = "e", problem = "https://atcoder.jp/contests/abc267/tasks/abc267_e" }
+abc267-ex = { alias = "ex", problem = "https://atcoder.jp/contests/abc267/tasks/abc267_h" }
+abc267-f = { alias = "f", problem = "https://atcoder.jp/contests/abc267/tasks/abc267_f" }
+abc267-g = { alias = "g", problem = "https://atcoder.jp/contests/abc267/tasks/abc267_g" }
+
+[[bin]]
+name = "abc267-a"
+path = "src/bin/a.rs"
+
+[[bin]]
+name = "abc267-b"
+path = "src/bin/b.rs"
+
+[[bin]]
+name = "abc267-c"
+path = "src/bin/c.rs"
+
+[[bin]]
+name = "abc267-d"
+path = "src/bin/d.rs"
+
+[[bin]]
+name = "abc267-e"
+path = "src/bin/e.rs"
+
+[[bin]]
+name = "abc267-ex"
+path = "src/bin/ex.rs"
+
+[[bin]]
+name = "abc267-f"
+path = "src/bin/f.rs"
+
+[[bin]]
+name = "abc267-g"
+path = "src/bin/g.rs"
+
+[dependencies]
+proconio = "0.4.3"
+num = "0.4.0"
+rand = "0.6"
+rustc-hash = "1.1"
+
+[dev-dependencies]
