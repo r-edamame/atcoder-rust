@@ -1,0 +1,45 @@
+[package]
+name = "abc200"
+version = "0.1.0"
+edition = "2018"
+
+[package.metadata.cargo-compete.bin]
+abc200-a = { alias = "a", problem = "https://atcoder.jp/contests/abc200/tasks/abc200_a" }
+abc200-b = { alias = "b", problem = "https://atcoder.jp/contests/abc200/tasks/abc200_b" }
+abc200-c = { alias = "c", problem = "https://atcoder.jp/contests/abc200/tasks/abc200_c" }
+abc200-d = { alias = "d", problem = "https://atcoder.jp/contests/abc200/tasks/abc200_d" }
+abc200-e = { alias = "e", problem = "https://atcoder.jp/contests/abc200/tasks/abc200_e" }
+abc200-f = { alias = "f", problem = "https://atcoder.jp/contests/abc200/tasks/abc200_f" }
+
+[[bin]]
+name = "abc200-a"
+path = "src/bin/a.rs"
+
+[[bin]]
+name = "abc200-b"
+path = "src/bin/b.rs"
+
+[[bin]]
+name = "abc200-c"
+path = "src/bin/c.rs"
+
+[[bin]]
+name = "abc200-d"
+path = "src/bin/d.rs"
+
+[[bin]]
+name = "abc200-e"
+path = "src/bin/e.rs"
+
+[[bin]]
+name = "abc200-f"
+path = "src/bin/f.rs"
+
+[dependencies]
+proconio = "0.4.3"
+num = "0.4.0"
+rand = "0.6"
+rustc-hash = "1.1"
+itertools   = "0.9.0"
+
+[dev-dependencies]

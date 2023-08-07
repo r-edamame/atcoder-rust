@@ -28,8 +28,62 @@ fn gen_iter<I: Copy + PartialOrd, F>(first: I, to: I, f: &'static F) -> impl Ite
 fn bit_digits(to: usize) -> impl Iterator<Item=usize> {gen_iter(1, to, &|x| x << 1)}
 fn bit_choose<T: Copy>(v: &Vec<T>) -> impl Iterator<Item = Vec<T>> + '_ {(0usize..1<<v.len()).map(move |n| (0usize..v.len()).filter_map(|i| if n & 1usize<<i > 0 { Some(v[i]) } else { None }).collect::<Vec<T>>())}
 
-
 fn main() {
     input! {
+        n: usize,
+        m: usize,
+        es: [(Usize1, Usize1); m],
     }
+
+    let mut g = vec![vec![]; n];
+    let mut grev = vec![vec![]; n];
+
+    for (from, to) in es {
+        g[from].push(to);
+        grev[to].push(from);
+    }
+
+    let mut ixes: Vec<(usize, &usize)> = ix(n, &g).iter().enumerate().collect();
+
+
+    println!("{:?}", ix(n, &g));
+}
+
+fn ix(n: usize, g: &Vec<Vec<usize>>) -> Vec<usize> {
+    let mut ixes = vec![0; n];
+    let mut used = vec![false; n];
+    let mut ix = 0;
+
+    for i in 0..n {
+        dfs1(g, i, &mut used, &mut ixes, &mut ix);
+    }
+    ixes
+}
+
+fn dfs1(g: &Vec<Vec<usize>>, i: usize, used: &mut Vec<bool>, ixes: &mut Vec<usize>, ix: &mut usize) {
+    if used[i] {
+        return;
+    }
+    used[i] = true;
+
+    for nx in g[i].iter() {
+        dfs1(g, *nx, used, ixes, ix);
+    }
+    ixes[i] = *ix;
+    *ix += 1;
+}
+
+fn dfs2(g: &Vec<Vec<usize>>, i: usize, used: &mut Vec<bool>) -> usize {
+    let mut cnt = 0;
+
+    if used[i] {
+        return 0;
+    }
+    used[i] = true;
+
+    for nx in g[i].iter() {
+        cnt += dfs2(g, *nx, used);
+    }
+
+    return cnt + 1;
 }

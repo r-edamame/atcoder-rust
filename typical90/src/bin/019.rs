@@ -1,7 +1,7 @@
 use proconio::input;
 use proconio::marker::{Chars, Usize1};
 use std::cmp::Ordering;
-use std::collections::{VecDeque as Queue, HashSet as HSet, BTreeSet as BSet, BTreeMap as BMap};
+use std::collections::{VecDeque as Queue, HashSet as HSet, BTreeSet as BSet, BTreeMap as BMap, HashMap as HMap};
 use std::ops::{Add, Sub, Mul};
 use std::fmt::Display;
 use num::pow::Pow;
@@ -27,9 +27,31 @@ fn yesno(b: bool) {println!("{}", if b { "Yes" } else { "No" });}
 fn gen_iter<I: Copy + PartialOrd, F>(first: I, to: I, f: &'static F) -> impl Iterator<Item=I>where F: Fn(I) -> I{std::iter::successors(Some(first), move |x| if f(*x) >= to { None } else { Some(f(*x)) })}
 fn bit_digits(to: usize) -> impl Iterator<Item=usize> {gen_iter(1, to, &|x| x << 1)}
 fn bit_choose<T: Copy>(v: &Vec<T>) -> impl Iterator<Item = Vec<T>> + '_ {(0usize..1<<v.len()).map(move |n| (0usize..v.len()).filter_map(|i| if n & 1usize<<i > 0 { Some(v[i]) } else { None }).collect::<Vec<T>>())}
+fn abs_diff(a: usize, b: usize) -> usize { a.max(b) - a.min(b) }
 
 
 fn main() {
     input! {
+        n: usize,
+        al: [usize; n * 2],
     }
+
+    let mut dp: Vec<Vec<usize>> = vec![vec![std::usize::MAX / 10; 401]; 401];
+    for i in 0..2*n-1 {
+        dp[i][i+1] = abs_diff(al[i], al[i+1]);
+    }
+
+    for m in (4..=2*n).step_by(2) {
+        for i in 0..(2*n)-m+1 {
+            let l = i;
+            let r = i + m - 1;
+            for k in (2..m).step_by(2) {
+                let tmp = dp[l][l+k-1] + dp[l+k][r];
+                dp[l][r] = dp[l][r].min(tmp);
+            }
+            dp[l][r] = dp[l][r].min(dp[l+1][r-1] + abs_diff(al[l], al[r]));
+        }
+    }
+
+    println!("{}", dp[0][2*n-1]);
 }

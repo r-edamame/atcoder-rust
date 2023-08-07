@@ -2,6 +2,7 @@ use proconio::input;
 use proconio::marker::{Chars, Usize1};
 use std::cmp::Ordering;
 use std::collections::{VecDeque as Queue, HashSet as HSet, BTreeSet as BSet, BTreeMap as BMap};
+use std::f64::consts::PI;
 use std::ops::{Add, Sub, Mul};
 use std::fmt::Display;
 use num::pow::Pow;
@@ -33,12 +34,30 @@ fn udg(v: Vec<(usize, usize)>, n: usize) -> Vec<Vec<usize>> {let mut g = vec![ve
 
 fn main() {
     input! {
-        n: usize,
-        m: usize,
-        vs: [(Usize1, Usize1); m],
+        t: usize,
+        l: f64,
+        cpos: (f64, f64),
+        q: usize,
+        es: [usize; q]
     }
 
-    let g = udg(vs, n);
+    for m in es {
+        let (whx, why, whz) = pos(l, t, m);
 
-    println!("{}", g.iter().map(|t| t.iter().join(" ")).join("\n"));
+        let xdiff = whx - cpos.0;
+        let ydiff = why - cpos.1;
+
+        let w = (xdiff*xdiff + ydiff*ydiff).sqrt();
+        let ans = (whz / w).atan() / PI * 180.0;
+        println!("{}", ans);
+    }
+}
+
+fn pos(l: f64, t: usize, min: usize) -> (f64, f64, f64) {
+    let fmin = min as f64;
+    let ft = t  as f64;
+    let y = ((fmin / ft) * (-2.0 * PI) + (3.0 / 2.0 * PI)).cos() * l / 2.0;
+    let z = ((fmin / ft) * (-2.0 * PI) + (3.0 / 2.0 * PI)).sin() * l / 2.0 + (l / 2.0);
+
+    (0.0, y, z)
 }

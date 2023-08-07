@@ -6,12 +6,15 @@ use std::ops::{Add, Sub, Mul};
 use std::fmt::Display;
 use num::pow::Pow;
 use std::iter::{FromIterator, IntoIterator};
+use itertools::Itertools;
 
 // BinarySearch
 trait BSearch<I> {fn first_upper_than(&self, p: I) -> Option<&I>;fn last_lower_than(&self, p: I) -> Option<&I>;}
 impl BSearch<isize> for BSet<isize> {fn first_upper_than(&self, p: isize) -> Option<&isize> {self.range(p+1..).next()} fn last_lower_than(&self, p: isize) -> Option<&isize> {self.range(std::isize::MIN..p).rev().next()}}
 impl BSearch<usize> for BSet<usize> {fn first_upper_than(&self, p: usize) -> Option<&usize> {self.range(p+1..).next()} fn last_lower_than(&self, p: usize) -> Option<&usize> {self.range(0..p).rev().next()}}
-fn bsearch<F>(lower: isize, upper: isize, sat: F) -> Option<isize>where F: Fn(isize) -> bool{let mut ng = lower-1;let mut ok = upper+1;while (ng-ok).abs() > 1 {let mid = (ng+ok)/2;if sat(mid) {ok = mid;} else {ng = mid;}}return if ok == upper+1 { None } else { Some(ok) };}
+fn upper_bound<F>(lower: isize, upper: isize, sat: F) -> Option<isize>where F: Fn(isize) -> bool{let mut ng = lower-1;let mut ok = upper+1;while (ng-ok).abs() > 1 {let mid = (ng+ok)/2;if sat(mid) {ok = mid;} else {ng = mid;}}return if ok == upper+1 { None } else { Some(ok) };}
+fn lower_bound<F>(lower: isize, upper: isize, sat: F) -> Option<isize>where F: Fn(isize) -> bool{let mut ok = lower-1;let mut ng = upper+1;while (ok-ng).abs() > 1 {let mid = (ok+ng)/2;if sat(mid) {ok = mid;} else {ng = mid;}}return if ok == lower - 1 { None } else { Some(ok) };}
+fn nearest<V: Copy + PartialOrd + Sub<Output = V>>(v: &Vec<V>, t: V) -> V {let mut cs = vec![];if let Some(ii) = upper_bound(0, v.len() as isize - 1, |i| t < v[i as usize]) {let i = ii as usize;if i == 0 {cs.push(v[i]);cs.push(v[v.len() - 1]);} else {cs.push(v[i]);cs.push(v[i - 1])}} else {cs.push(v[0]);cs.push(v[v.len() - 1]);}return *cs.iter().min_by(|&&a, &&b| {abs_diff(t, a).partial_cmp(&abs_diff(t, b)).unwrap()}).unwrap();}
 // cumulative sum
 fn cumlative<N: std::ops::Add + num::Zero + Clone + Copy>(v: Vec<N>) -> Vec<N> {let mut a: Vec<N> = vec![N::zero(); v.len()+1];for i in 0..v.len() {a[i+1] = a[i] + v[i]}a}
 // Mint
@@ -28,13 +31,34 @@ fn gen_iter<I: Copy + PartialOrd, F>(first: I, to: I, f: &'static F) -> impl Ite
 fn bit_digits(to: usize) -> impl Iterator<Item=usize> {gen_iter(1, to, &|x| x << 1)}
 fn bit_choose<T: Copy>(v: &Vec<T>) -> impl Iterator<Item = Vec<T>> + '_ {(0usize..1<<v.len()).map(move |n| (0usize..v.len()).filter_map(|i| if n & 1usize<<i > 0 { Some(v[i]) } else { None }).collect::<Vec<T>>())}
 
+fn abs_diff<V: Copy + PartialOrd + Sub<Output = V>>(a :V, b: V) -> V {(if a > b { a } else { b }) - (if a < b { a } else { b })}
+fn udg(v: Vec<(usize, usize)>, n: usize) -> Vec<Vec<usize>> {let mut g = vec![vec![]; n];for (t, f) in v {g[t].push(f);g[f].push(t);}g}
+
 
 fn main() {
     input! {
-        a: usize,
-        b: usize,
-        c: usize,
+        mut a: isize,
+        mut b: isize,
     }
 
-    yesno(a < c.pow(b as u32));
+    let mut ans = 0;
+    while a > 0 || b > 0 {
+        let g = gcd(a, b);
+        println!("hoge");
+        a = a - g;
+        b = b - g;
+        ans += 1;
+    }
+
+    println!("{}", ans);
+}
+
+fn gcd(a: isize, b: isize) -> isize {
+    if b == 0 {
+        return a;
+    } else if a == 0 {
+        return b;
+    } else {
+        return gcd(b, a%b);
+    }
 }
